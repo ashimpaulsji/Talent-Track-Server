@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -28,13 +28,13 @@ class AuthController extends Controller
 
         $user = User::create([
             'username' => $request->username,
-            'name' => $request->name,  // Add this line
+            'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
 
-        $token = Auth::login($user);
+        $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'status' => 'success',
@@ -44,7 +44,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'type' => 'bearer',
             ]
-        ], 201);  // Use 201 status code for resource creation
+        ], 201);
     }
 
     public function login(Request $request)
@@ -58,7 +58,7 @@ class AuthController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        if (!$token = Auth::attempt($validator->validated())) {
+        if (!$token = JWTAuth::attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -76,7 +76,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
+            'expires_in' => config('jwt.ttl') * 60,
             'user' => Auth::user()
         ]);
     }
