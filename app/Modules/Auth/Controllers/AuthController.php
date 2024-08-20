@@ -15,18 +15,20 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users',
+            'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
             'role' => 'required|in:employee,job_seeker,admin',
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return response()->json($validator->errors(), 422);
         }
 
         $user = User::create([
             'username' => $request->username,
+            'name' => $request->name,  // Add this line
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
@@ -42,7 +44,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'type' => 'bearer',
             ]
-        ]);
+        ], 201);  // Use 201 status code for resource creation
     }
 
     public function login(Request $request)
