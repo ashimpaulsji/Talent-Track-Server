@@ -30,4 +30,14 @@ class AuthController extends Controller
     {
         return $this->authService->logout();
     }
+
+    public function refreshToken()
+    {
+        return $this->authService->refreshToken();
+    }
+
+    public function profile()
+    {
+        return $this->authService->getProfile();
+    }
 }
