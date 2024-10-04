@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Employer\Requests\CompanyProfileRequest;
 use App\Modules\Employer\Requests\JobPostRequest;
 use App\Modules\Employer\Services\EmployerService;
-use Illuminate\Http\Request;
+
 
 class EmployerController extends Controller
 {

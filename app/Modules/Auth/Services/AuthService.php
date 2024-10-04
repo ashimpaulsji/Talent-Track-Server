@@ -5,6 +5,7 @@ namespace App\Modules\Auth\Services;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService
@@ -40,11 +41,34 @@ class AuthService
 
         return $this->createNewToken($token);
     }
+    
 
     public function logout()
     {
         Auth::logout();
         return response()->json(['message' => 'User successfully signed out']);
+    }
+
+    public function forgotPassword(array $data)
+    {
+        $status = Password::sendResetLink($data);
+
+        return $status === Password::RESET_LINK_SENT
+            ? response()->json(['message' => 'Reset password link sent to your email'], 200)
+            : response()->json(['message' => 'Unable to send reset link'], 400);
+    }
+
+    public function resetPassword(array $data)
+    {
+        $status = Password::reset($data, function ($user, $password) {
+            $user->forceFill([
+                'password' => Hash::make($password)
+            ])->save();
+        });
+
+        return $status === Password::PASSWORD_RESET
+            ? response()->json(['message' => 'Password has been successfully reset'], 200)
+            : response()->json(['message' => 'Unable to reset password'], 400);
     }
 
     protected function createNewToken($token)

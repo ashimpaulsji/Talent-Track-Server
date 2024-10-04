@@ -21,6 +21,8 @@ class CompanyProfileRequest extends FormRequest
             'location' => 'required|string|max:255',
             'contact_email' => 'required|email',
             'contact_phone' => 'required|string|max:20',
+            'position' => 'sometimes|required|string|max:255',
+            'department' => 'sometimes|required|string|max:255',
         ];
     }
 }
