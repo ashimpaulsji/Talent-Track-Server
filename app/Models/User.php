@@ -28,6 +28,7 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'id' => 'string',
         'is_verified' => 'boolean',
+        'email_verified_at' => 'datetime',
     ];
 
     protected $hidden = [
@@ -41,7 +42,7 @@ class User extends Authenticatable implements JWTSubject
 
         static::creating(function ($model) {
             if (empty($model->{$model->getKeyName()})) {
-                $model->{$model->getKeyName()} = Str::uuid()->toString();
+                $model->{$model->getKeyName()} = (string) Str::uuid();
             }
         });
     }
@@ -65,7 +66,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Profile::class);
     }
-
+    
     public function getJWTIdentifier()
     {
         return $this->getKey();
@@ -74,5 +75,20 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+
+    public function getRoleSpecificProfile()
+    {
+        switch ($this->role) {
+            case 'employee':
+                return $this->employee;
+            case 'job_seeker':
+                return $this->jobSeeker;
+            case 'admin':
+                return $this->admin;
+            default:
+                return null;
+        }
     }
 }
