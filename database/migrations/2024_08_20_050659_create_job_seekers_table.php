@@ -6,19 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('job_seekers', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('user_id')->constrained()->onDelete('cascade');
-            $table->text('resume')->nullable();
-            $table->text('skills')->nullable();
-            $table->text('experience')->nullable();
+            $table->uuid('user_id');
+            $table->text('resume');
+            $table->json('skills');
+            $table->text('experience');
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('job_seekers');
     }
