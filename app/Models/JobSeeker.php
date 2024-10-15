@@ -16,6 +16,10 @@ class JobSeeker extends Model
         'experience',
     ];
 
+    protected $casts = [
+        'skills' => 'array',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -24,5 +28,10 @@ class JobSeeker extends Model
     public function appliedJobs()
     {
         return $this->hasMany(AppliedJob::class);
+    }
+
+    public function savedJobs()
+    {
+        return $this->hasMany(SavedJob::class);
     }
 }
