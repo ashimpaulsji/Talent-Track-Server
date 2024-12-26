@@ -9,9 +9,7 @@ class JobSeeker extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id', 'resume', 'skills', 'experience'
-    ];
+    protected $fillable = ['user_id'];
 
     public function user()
     {
@@ -20,6 +18,11 @@ class JobSeeker extends Model
 
     public function appliedJobs()
     {
-        return $this->hasMany(AppliedJob::class, 'job_seeker_id');
+        return $this->hasMany(AppliedJob::class);
+    }
+
+    public function savedJobs()
+    {
+        return $this->hasMany(SavedJob::class);
     }
 }

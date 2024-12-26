@@ -9,9 +9,8 @@ class Admin extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id', 'role'
-    ];
+    protected $fillable = ['user_id'];
+
 
     public function user()
     {
