@@ -10,7 +10,13 @@ class AppliedJob extends Model
     use HasFactory;
 
     protected $fillable = [
-        'job_id', 'job_seeker_id', 'application_date'
+        'job_id',
+        'job_seeker_id',
+        'application_date',
+    ];
+
+    protected $casts = [
+        'application_date' => 'datetime',
     ];
 
     public function job()
@@ -20,6 +26,6 @@ class AppliedJob extends Model
 
     public function jobSeeker()
     {
-        return $this->belongsTo(JobSeeker::class, 'job_seeker_id');
+        return $this->belongsTo(JobSeeker::class);
     }
 }
