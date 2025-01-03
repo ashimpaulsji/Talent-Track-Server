@@ -11,6 +11,7 @@ use App\Modules\Auth\Services\AuthService;
 use App\Utils\ApiResponse;
 use Illuminate\Support\Facades\Auth;
 
+
 class AuthController extends Controller
 {
     protected $authService;
@@ -26,35 +27,34 @@ class AuthController extends Controller
 
         return ApiResponse::success([
             'user' => $result['user'],
-            'authorisation' => [
+            'authorization' => [
                 'token' => $result['token'],
                 'type' => 'bearer',
             ]
         ], 'User created successfully', 201);
     }
 
-    // public function login(LoginRequest $request)
-    // {
-    //     $result = $this->authService->login($request->validated());
-
-    //     if (!$result) {
-    //         return ApiResponse::error('Unauthorized', 401);
-    //     }
-    //     return ApiResponse::success($result, 'Login successful');
-    // }
-
     public function login(LoginRequest $request)
     {
         $credentials = $request->only('email', 'password');
-        $result = $this->authService->login($credentials);
 
-        error_log($result);
+        try {
+            $result = $this->authService->login($credentials);
 
-        // if (!$result) {
-        //     return ApiResponse::error('Invalid credentials', 401);
-        // }
-
-        return ApiResponse::success($result, 'Login successful');
+            if ($result['success']) {
+                return ApiResponse::success([
+                    'user' => $result['user'],
+                    'authorization' => [
+                        'token' => $result['token'],
+                        'type' => 'bearer',
+                    ]
+                ], 'User logged in successfully');
+            } else {
+                return ApiResponse::error($result['message'], 401);
+            }
+        } catch (\Exception $e) {
+            return ApiResponse::error('An error occurred during login: ' . $e->getMessage(), 500);
+        }
     }
 
     public function refresh()

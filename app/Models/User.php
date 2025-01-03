@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Support\Str;
 
@@ -52,6 +53,16 @@ class User extends Authenticatable implements JWTSubject
         });
     }
 
+    public function getAuthPassword()
+    {
+        return $this->password;
+    }
+ 
+    public function passwordNeedsRehash()
+    {
+        return Hash::needsRehash($this->password);
+    }
+
     public function employee()
     {
         return $this->hasOne(Employee::class);
@@ -72,24 +83,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Profile::class);
     }
 
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
 
     public function getFullNameAttribute()
     {
         return "{$this->first_name} {$this->last_name}";
-    }
-
-    public function setPasswordAttribute($value)
-    {
-        $this->attributes['password'] = bcrypt($value);
     }
 
     public function isEmployee()
@@ -110,6 +107,17 @@ class User extends Authenticatable implements JWTSubject
     public function hasVerifiedEmail()
     {
         return $this->is_verified;
+    }
+
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 
     public function markEmailAsVerified()

@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthService
 {
@@ -20,7 +22,7 @@ class AuthService
             'first_name' => $data['first_name'],
             'last_name' => $data['last_name'],
             'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'password' => $data['password'],
             'country' => $data['country'],
             'job_title' => $data['job_title'] ?? null,
             'newsletter' => $data['newsletter'],
@@ -52,31 +54,29 @@ class AuthService
         ];
     }
 
-    // public function login(array $credentials)
-    // {
-    //     if (!$token = JWTAuth::attempt($credentials)) {
-    //         return false;
-    //     }
-
-    //     return $this->createNewToken(token: $token);
-    // }
-
     public function login(array $credentials)
     {
-        if (!$token = Auth::guard('api')->attempt($credentials)) {
-            return false;
-        }
+        try {
+            $user = User::where('email', $credentials['email'])->first();
+            if (!$user) {
+                return ['success' => false, 'message' => 'Invalid credentials'];
+            }
+            if ($credentials['password'] === $user->password) {
+                $token = JWTAuth::fromUser($user);
 
-        $user = Auth::guard('api')->user();
-        
-        return [
-            'user' => $user,
-            'authorisation' => [
-                'token' => $token,
-                'type' => 'bearer',
-            ]
-        ];
+                return [
+                    'success' => true,
+                    'user' => $user,
+                    'token' => $token
+                ];
+            } else {
+                return ['success' => false, 'message' => 'Invalid credentials'];
+            }
+        } catch (JWTException $e) {
+            return ['success' => false, 'message' => 'Failed to create token'];
+        }
     }
+
 
     public function refresh()
     {
