@@ -10,24 +10,40 @@ class EmployerService
     public function createOrUpdateCompanyProfile($data)
     {
         $user = Auth::user();
-        $employee = $user->employee;
+        // $employee = $user->employee;
 
-        if (!$employee) {
-            $employee = Employee::create([
-                'user_id' => $user->id,
-                'position' => $data['position'] ?? 'Employer',
-                'department' => $data['department'] ?? 'Management',
-                'company_name' => $data['company_name'],
-                'company_description' => $data['company_description'],
-                'industry' => $data['industry'],
-                'website' => $data['website'] ?? null,
-                'location' => $data['location'],
-                'contact_email' => $data['contact_email'],
-                'contact_phone' => $data['contact_phone'],
-            ]);
-        } else {
-            $employee->update($data);
-        }
+        // error_log(print_r($employee, true));
+
+        error_log(print_r($user, true));
+
+        $employeeData = [
+            'position' => $data['position'] ?? 'Employer',
+            'department' => $data['department'] ?? 'Management',
+            'company_name' => $data['company_name'],
+            'company_description' => $data['company_description'],
+            'industry' => $data['industry'],
+            'website' => $data['website'] ?? null,
+            'location' => $data['location'],
+            'contact_email' => $data['contact_email'],
+            'contact_phone' => $data['contact_phone'],
+        ];
+
+        // error_log(print_r($employeeData, true));
+
+        error_log('User ID: ' . $user->id);
+
+
+        // if (!$employee) {
+        //     $employeeData['user_id'] = $user->id;
+        //     $employee = Employee::create($employeeData);
+        // } else {
+        //     $employee->update($employeeData);
+        // }
+
+        $employee = Employee::updateOrCreate(
+            ['user_id' => $user->id],
+            $employeeData
+        );
 
         return $employee;
     }

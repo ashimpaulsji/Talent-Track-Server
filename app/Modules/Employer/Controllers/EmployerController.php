@@ -17,6 +17,7 @@ class EmployerController extends Controller
     public function createOrUpdateCompanyProfile(CompanyProfileRequest $request)
     {
         $profile = $this->employerService->createOrUpdateCompanyProfile($request->validated());
+        
         return response()->json(['message' => 'Company profile updated successfully', 'data' => $profile]);
     }
 
