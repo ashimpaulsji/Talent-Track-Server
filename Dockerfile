@@ -1,5 +1,5 @@
 # Build stage
-FROM composer:latest AS build
+FROM composer:2.6 AS build
 
 WORKDIR /app
 COPY . /app
